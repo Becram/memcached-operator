@@ -39,7 +39,7 @@ import (
 	cachev1alpha1 "github.com/becram/memcached-operator/api/v1alpha1"
 )
 
-const memcachedFinalizer = "cache.example.com/finalizer"
+const memcachedFinalizer = "cache.teraops.co/finalizer"
 
 // Definitions to manage status conditions
 const (
