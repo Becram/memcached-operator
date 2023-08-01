@@ -32,7 +32,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
 	cachev1alpha1 "github.com/Becram/memcached-operator/api/v1alpha1"
-	"github.com/Becram/memcached-operator/internal/controller"
+	"github.com/Becram/memcached-operator/controller"
 	//+kubebuilder:scaffold:imports
 )
 
