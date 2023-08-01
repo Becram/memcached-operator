@@ -31,8 +31,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
-	cachev1alpha1 "github.com/Becram/memcached-operator/api/v1alpha1"
-	"github.com/Becram/memcached-operator/controller"
+	cachev1alpha1 "github.com/Becarm/memcached-operator/api/v1alpha1"
+	"github.com/Becram/memcached-operator/controllers"
 	//+kubebuilder:scaffold:imports
 )
 
@@ -68,11 +68,10 @@ func main() {
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
 		Scheme:                 scheme,
 		MetricsBindAddress:     metricsAddr,
-		Namespace:              "",
 		Port:                   9443,
 		HealthProbeBindAddress: probeAddr,
 		LeaderElection:         enableLeaderElection,
-		LeaderElectionID:       "78a738d3.teraops.co",
+		LeaderElectionID:       "86f835c3.example.com",
 		// LeaderElectionReleaseOnCancel defines if the leader should step down voluntarily
 		// when the Manager ends. This requires the binary to immediately end when the
 		// Manager is stopped, otherwise, this setting is unsafe. Setting this significantly
@@ -90,12 +89,18 @@ func main() {
 		os.Exit(1)
 	}
 
-	if err = (&controller.MemcachedReconciler{
-		Client:   mgr.GetClient(),
-		Scheme:   mgr.GetScheme(),
+	if err = (&controllers.MemcachedReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+		// Add a Recorder to the reconciler.
+		// This allows the operator author to emit events during reconcilliation.
 		Recorder: mgr.GetEventRecorderFor("memcached-controller"),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "Memcached")
+		os.Exit(1)
+	}
+	if err = (&cachev1alpha1.Memcached{}).SetupWebhookWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create webhook", "webhook", "Memcached")
 		os.Exit(1)
 	}
 	//+kubebuilder:scaffold:builder
